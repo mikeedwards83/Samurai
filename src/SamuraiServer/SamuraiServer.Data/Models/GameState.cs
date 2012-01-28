@@ -2,11 +2,16 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using MongoDB.Bson.Serialization.Attributes;
 
 namespace SamuraiServer.Data
 {
     public class GameState
     {
+
+        [BsonId]
+        public string BsonId { get; set; }
+
         public Guid Id { get; set; }
 
         public string Name { get; set; }

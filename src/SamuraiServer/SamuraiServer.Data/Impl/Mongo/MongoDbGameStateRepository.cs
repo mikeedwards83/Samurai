@@ -2,11 +2,25 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using MongoDB.Driver;
+using MongoDB.Driver.Builders;
+using MongoDB.Bson;
 
 namespace SamuraiServer.Data.Impl
 {
     public class MongoDbGameStateRepository : IGameStateRepository
     {
+        string _databaseName = "Code52Samurai";
+        string _serverAddress = "mongodb://127.0.0.1:27017/";
+        MongoDatabase _db;
+
+        public MongoDbGameStateRepository()
+        {
+            MongoServer server = MongoServer.Create(_serverAddress);
+
+            _db = server.GetDatabase(_databaseName);
+        }
+
         // TODO: If we decide to launch with MongoDb then we need to be able to store our game state
 
         public IQueryable<GameState> GetAll()
@@ -21,12 +35,17 @@ namespace SamuraiServer.Data.Impl
 
         public GameState Get(Guid id)
         {
-            throw new NotImplementedException();
+            var gameStates = _db.GetCollection<GameState>("gameState");
+
+            var query = Query.EQ("Id", id);
+            return gameStates.FindOne(query);
         }
 
         public void Add(GameState entity)
         {
-            throw new NotImplementedException();
+            var gameStates = _db.GetCollection<GameState>("gameState");
+            entity.BsonId = ObjectId.GenerateNewId().ToString();
+            gameStates.Insert(entity);
         }
 
         public void Delete(Guid id)
